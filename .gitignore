@@ -52,3 +52,6 @@ dmypy.json
 
 # Claude Code local settings (may contain credentials from allowed commands)
 .claude/
+
+# Local working notes (may contain sensitive info)
+prompt.md

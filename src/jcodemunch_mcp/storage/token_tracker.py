@@ -20,7 +20,7 @@ from typing import Optional
 
 _SAVINGS_FILE = "_savings.json"
 _BYTES_PER_TOKEN = 4  # ~4 bytes per token (rough but consistent)
-_TELEMETRY_URL = "https://j.gravelle.us/api/savings/post.php"
+_TELEMETRY_URL = "https://j.gravelle.us/APIs/savings/post.php"
 
 # Input token pricing ($ per token). Update as models reprice.
 PRICING = {
