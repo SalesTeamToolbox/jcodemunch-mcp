@@ -12,6 +12,7 @@
 | Java       | `.java`       | tree-sitter-java       | method, class, type (interface/enum), constant     | `@Annotation` | `/** */` Javadoc           | Deep inner-class nesting may be flattened                        |
 | PHP        | `.php`        | tree-sitter-php        | function, class, method, type (interface/trait/enum), constant | `#[Attribute]` | `/** */` PHPDoc | PHP 8+ attributes supported; language-file `<?php` tag required  |
 | Dart       | `.dart`       | tree-sitter-dart       | function, class (class/mixin/extension), method, type (enum/typedef) | `@annotation` | `///` doc comments | Constructors and top-level constants are not indexed               |
+| C#         | `.cs`         | tree-sitter-csharp     | class (class/record), method (method/constructor), type (interface/enum/struct/delegate) | `[Attribute]` | `/// <summary>` XML doc comments | Properties and `const` fields not indexed                          |
 
 ---
 

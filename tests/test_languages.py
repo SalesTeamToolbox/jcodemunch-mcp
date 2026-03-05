@@ -366,3 +366,96 @@ def test_parse_dart():
     assert method.qualified_name == "Calculator.add"
     assert getter.qualified_name == "Calculator.isPositive"
 
+
+CSHARP_SOURCE = '''
+using System;
+using System.Collections.Generic;
+
+namespace SampleApp
+{
+    /// <summary>Manages user data and operations.</summary>
+    public class UserService
+    {
+        /// <summary>Initializes the service.</summary>
+        public UserService() {}
+
+        /// <summary>Gets a user by identifier.</summary>
+        [Obsolete("Use GetUserAsync instead")]
+        public string GetUser(int userId) => $"user-{userId}";
+
+        /// <summary>Removes a user.</summary>
+        public bool DeleteUser(int userId) { return true; }
+    }
+
+    /// <summary>Repository contract.</summary>
+    public interface IRepository
+    {
+        List<string> GetAll();
+    }
+
+    /// <summary>Request status codes.</summary>
+    public enum Status { Pending, Active, Done }
+
+    /// <summary>A 2D coordinate.</summary>
+    public struct Point { public int X; public int Y; }
+
+    /// <summary>Event delegate.</summary>
+    public delegate void EventCallback(object sender, EventArgs e);
+
+    /// <summary>An immutable person record.</summary>
+    public record Person(string Name, int Age);
+}
+'''
+
+
+def test_parse_csharp():
+    """Test C# parsing."""
+    symbols = parse_file(CSHARP_SOURCE, "Sample.cs", "csharp")
+
+    # Class
+    cls = next((s for s in symbols if s.name == "UserService" and s.kind == "class"), None)
+    assert cls is not None
+    assert "Manages user data" in cls.docstring
+
+    # Constructor (method inside class)
+    ctor = next((s for s in symbols if s.name == "UserService" and s.kind == "method"), None)
+    assert ctor is not None
+    assert ctor.qualified_name == "UserService.UserService"
+
+    # Method with attribute
+    method = next((s for s in symbols if s.name == "GetUser"), None)
+    assert method is not None
+    assert method.kind == "method"
+    assert "Gets a user" in method.docstring
+    assert any("[Obsolete" in d for d in method.decorators)
+    assert method.qualified_name == "UserService.GetUser"
+
+    # Another method
+    delete = next((s for s in symbols if s.name == "DeleteUser"), None)
+    assert delete is not None
+    assert delete.kind == "method"
+
+    # Interface
+    iface = next((s for s in symbols if s.name == "IRepository"), None)
+    assert iface is not None
+    assert iface.kind == "type"
+
+    # Enum
+    enum = next((s for s in symbols if s.name == "Status"), None)
+    assert enum is not None
+    assert enum.kind == "type"
+
+    # Struct
+    struct = next((s for s in symbols if s.name == "Point"), None)
+    assert struct is not None
+    assert struct.kind == "type"
+
+    # Delegate
+    delegate = next((s for s in symbols if s.name == "EventCallback"), None)
+    assert delegate is not None
+    assert delegate.kind == "type"
+
+    # Record
+    record = next((s for s in symbols if s.name == "Person"), None)
+    assert record is not None
+    assert record.kind == "class"

@@ -318,16 +318,23 @@ def _extract_decorators(node, spec: LanguageSpec, source_bytes: bytes) -> list[s
     """Extract decorators/attributes from a node."""
     if not spec.decorator_node_type:
         return []
-    
+
     decorators = []
-    
-    # Walk backwards through siblings to find decorators
-    prev = node.prev_named_sibling
-    while prev and prev.type == spec.decorator_node_type:
-        decorator_text = source_bytes[prev.start_byte:prev.end_byte].decode("utf-8")
-        decorators.insert(0, decorator_text.strip())
-        prev = prev.prev_named_sibling
-    
+
+    if spec.decorator_from_children:
+        # C#: attribute_list nodes are direct children of the declaration
+        for child in node.children:
+            if child.type == spec.decorator_node_type:
+                decorator_text = source_bytes[child.start_byte:child.end_byte].decode("utf-8")
+                decorators.append(decorator_text.strip())
+    else:
+        # Other languages: decorators are preceding siblings
+        prev = node.prev_named_sibling
+        while prev and prev.type == spec.decorator_node_type:
+            decorator_text = source_bytes[prev.start_byte:prev.end_byte].decode("utf-8")
+            decorators.insert(0, decorator_text.strip())
+            prev = prev.prev_named_sibling
+
     return decorators
 
 

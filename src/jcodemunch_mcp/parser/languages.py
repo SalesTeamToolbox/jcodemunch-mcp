@@ -42,6 +42,10 @@ class LanguageSpec:
     constant_patterns: list[str]   # Node types for constants
     type_patterns: list[str]       # Node types for type definitions
 
+    # If True, decorators are direct children of the declaration node (e.g. C#)
+    # If False (default), decorators are preceding siblings (e.g. Python, Java)
+    decorator_from_children: bool = False
+
 
 # File extension to language mapping
 LANGUAGE_EXTENSIONS = {
@@ -55,6 +59,7 @@ LANGUAGE_EXTENSIONS = {
     ".java": "java",
     ".php": "php",
     ".dart": "dart",
+    ".cs": "csharp",
 }
 
 
@@ -309,6 +314,46 @@ DART_SPEC = LanguageSpec(
 )
 
 
+# C# specification
+CSHARP_SPEC = LanguageSpec(
+    ts_language="csharp",
+    symbol_node_types={
+        "class_declaration": "class",
+        "record_declaration": "class",
+        "interface_declaration": "type",
+        "enum_declaration": "type",
+        "struct_declaration": "type",
+        "delegate_declaration": "type",
+        "method_declaration": "method",
+        "constructor_declaration": "method",
+    },
+    name_fields={
+        "class_declaration": "name",
+        "record_declaration": "name",
+        "interface_declaration": "name",
+        "enum_declaration": "name",
+        "struct_declaration": "name",
+        "delegate_declaration": "name",
+        "method_declaration": "name",
+        "constructor_declaration": "name",
+    },
+    param_fields={
+        "method_declaration": "parameters",
+        "constructor_declaration": "parameters",
+        "delegate_declaration": "parameters",
+    },
+    return_type_fields={
+        "method_declaration": "returns",
+    },
+    docstring_strategy="preceding_comment",
+    decorator_node_type="attribute_list",
+    decorator_from_children=True,
+    container_node_types=["class_declaration", "struct_declaration", "record_declaration", "interface_declaration"],
+    constant_patterns=[],
+    type_patterns=["interface_declaration", "enum_declaration", "struct_declaration", "delegate_declaration", "record_declaration"],
+)
+
+
 # Language registry
 LANGUAGE_REGISTRY = {
     "python": PYTHON_SPEC,
@@ -319,4 +364,5 @@ LANGUAGE_REGISTRY = {
     "java": JAVA_SPEC,
     "php": PHP_SPEC,
     "dart": DART_SPEC,
+    "csharp": CSHARP_SPEC,
 }

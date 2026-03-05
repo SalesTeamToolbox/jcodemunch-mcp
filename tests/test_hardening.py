@@ -240,6 +240,39 @@ class TestPerLanguageExtraction:
         get_user = _by_name(symbols, "getUser")
         assert "Sample" in get_user.qualified_name
 
+    # -- C# --------------------------------------------------------------
+
+    def test_csharp_class(self):
+        content, fname = _fixture("csharp", "sample.cs")
+        symbols = parse_file(content, fname, "csharp")
+        cls = _by_name(symbols, "UserService")
+        assert cls.kind == "class"
+
+    def test_csharp_method_qualified_name(self):
+        content, fname = _fixture("csharp", "sample.cs")
+        symbols = parse_file(content, fname, "csharp")
+        method = _by_name(symbols, "GetUser")
+        assert method.kind == "method"
+        assert "UserService" in method.qualified_name
+
+    def test_csharp_interface(self):
+        content, fname = _fixture("csharp", "sample.cs")
+        symbols = parse_file(content, fname, "csharp")
+        iface = _by_name(symbols, "IRepository")
+        assert iface.kind == "type"
+
+    def test_csharp_enum(self):
+        content, fname = _fixture("csharp", "sample.cs")
+        symbols = parse_file(content, fname, "csharp")
+        enum = _by_name(symbols, "Status")
+        assert enum.kind == "type"
+
+    def test_csharp_record(self):
+        content, fname = _fixture("csharp", "sample.cs")
+        symbols = parse_file(content, fname, "csharp")
+        record = _by_name(symbols, "Person")
+        assert record.kind == "class"
+
 
 # ===========================================================================
 # 2. Overload Disambiguation
@@ -323,6 +356,7 @@ class TestDeterminism:
         ("rust", "sample.rs"),
         ("java", "Sample.java"),
         ("dart", "sample.dart"),
+        ("csharp", "sample.cs"),
     ])
     def test_deterministic_ids_and_hashes(self, language, filename):
         content, fname = _fixture(language, filename)
