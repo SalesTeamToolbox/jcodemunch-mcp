@@ -13,8 +13,12 @@
 | PHP        | `.php`        | tree-sitter-php        | function, class, method, type (interface/trait/enum), constant | `#[Attribute]` | `/** */` PHPDoc | PHP 8+ attributes supported; language-file `<?php` tag required  |
 | Dart       | `.dart`       | tree-sitter-dart       | function, class (class/mixin/extension), method, type (enum/typedef) | `@annotation` | `///` doc comments | Constructors and top-level constants are not indexed               |
 | C#         | `.cs`         | tree-sitter-csharp     | class (class/record), method (method/constructor), type (interface/enum/struct/delegate) | `[Attribute]` | `/// <summary>` XML doc comments | Properties and `const` fields not indexed                          |
-| C          | `.c`, `.h`    | tree-sitter-c          | function, type (struct/enum/union), constant | —             | `/* */` and `//` comments | `#define` macros extracted as constants; no class/method hierarchy |
-| Perl       | `.pl`, `.pm`, `.t` | tree-sitter-perl  | function, class (package), constant          | —             | Preceding `#` comments and POD blocks | `use constant` extracted as constants; no return type inference |
+| C          | `.c`          | tree-sitter-c          | function, type (struct/enum/union), constant | —             | `/* */` and `//` comments | `#define` macros extracted as constants; no class/method hierarchy |
+| C++        | `.cpp`, `.cc`, `.cxx`, `.hpp`, `.hh`, `.hxx`, `.h`* | tree-sitter-cpp | function, class, method, type (struct/enum/union/alias), constant | — | `/* */` and `//` comments | Namespace symbols are used for qualification but not emitted as standalone symbols |
+| Elixir     | `.ex`, `.exs` | tree-sitter-elixir | class (defmodule/defimpl), type (defprotocol/@type/@callback), method (def/defp/defmacro/defguard inside module), function (top-level def) | — | `@doc`/`@moduledoc` strings | Homoiconic grammar; custom walker required. `defstruct`, `use`, `import`, `alias` not indexed |
+| Ruby       | `.rb`, `.rake` | tree-sitter-ruby  | class, type (module), method (instance + `self.` singleton), function (top-level def) | — | `#` preceding comments | `attr_accessor`, constants, and `include`/`extend` not indexed |
+
+\* `.h` uses C++ parsing first, then falls back to C when no C++ symbols are extracted.
 
 ---
 
@@ -107,25 +111,20 @@ print_tree(tree.root_node)
 
 This inspection process helps identify the correct `symbol_node_types`, `name_fields`, and extraction rules when adding support for a new language.
 
----
 
 ## Configuration
 
-### Custom Extension Mappings (`JCODEMUNCH_EXTRA_EXTENSIONS`)
+### `JCODEMUNCH_EXTRA_EXTENSIONS`
 
-Set the `JCODEMUNCH_EXTRA_EXTENSIONS` environment variable to add or override file extension → language mappings without modifying source code.
-
-**Format:** comma-separated `.ext:lang` pairs
+Map additional file extensions to languages at startup without modifying source:
 
 ```
-JCODEMUNCH_EXTRA_EXTENSIONS=".cgi:perl,.psgi:perl,.pl6:perl"
+JCODEMUNCH_EXTRA_EXTENSIONS=".cgi:perl,.psgi:perl,.mjs:javascript"
 ```
 
-**Rules:**
-- Extensions can add new mappings or override built-in ones.
-- `lang` must be a registered language name (e.g. `perl`, `python`, `go`). Unknown language values are logged as a warning and skipped.
-- Malformed entries (missing colon, empty extension or language) are logged as a warning and skipped.
-- Built-in mappings are never removed — only added to or overridden.
-- Mappings are applied once at import time and are visible to all indexing tools.
+- Comma-separated `.ext:lang` pairs
+- Overrides built-in mappings on collision
+- Unknown languages and malformed entries are skipped with a warning
+- Valid language names: `python`, `javascript`, `typescript`, `go`, `rust`, `java`, `php`, `dart`, `csharp`, `c`, `cpp`, `swift`, `elixir`, `ruby`, `perl`
 
-**Registered language names:** `python`, `javascript`, `typescript`, `go`, `rust`, `java`, `php`, `dart`, `csharp`, `c`, `perl`
+Set via `.mcp.json` `env` block or any environment mechanism supported by your MCP client.
