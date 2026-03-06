@@ -13,8 +13,13 @@
 | PHP        | `.php`        | tree-sitter-php        | function, class, method, type (interface/trait/enum), constant | `#[Attribute]` | `/** */` PHPDoc | PHP 8+ attributes supported; language-file `<?php` tag required  |
 | Dart       | `.dart`       | tree-sitter-dart       | function, class (class/mixin/extension), method, type (enum/typedef) | `@annotation` | `///` doc comments | Constructors and top-level constants are not indexed               |
 | C#         | `.cs`         | tree-sitter-csharp     | class (class/record), method (method/constructor), type (interface/enum/struct/delegate) | `[Attribute]` | `/// <summary>` XML doc comments | Properties and `const` fields not indexed                          |
-| C          | `.c`, `.h`    | tree-sitter-c          | function, type (struct/enum/union), constant | —             | `/* */` and `//` comments | `#define` macros extracted as constants; no class/method hierarchy |
+| C          | `.c`          | tree-sitter-c          | function, type (struct/enum/union), constant | —             | `/* */` and `//` comments | `#define` macros extracted as constants; no class/method hierarchy |
+| C++        | `.cpp`, `.cc`, `.cxx`, `.hpp`, `.hh`, `.hxx`, `.h`* | tree-sitter-cpp | function, class, method, type (struct/enum/union/alias), constant | — | `/* */` and `//` comments | Namespace symbols are used for qualification but not emitted as standalone symbols |
+| Elixir     | `.ex`, `.exs` | tree-sitter-elixir | class (defmodule/defimpl), type (defprotocol/@type/@callback), method (def/defp/defmacro/defguard inside module), function (top-level def) | — | `@doc`/`@moduledoc` strings | Homoiconic grammar; custom walker required. `defstruct`, `use`, `import`, `alias` not indexed |
+| Ruby       | `.rb`, `.rake` | tree-sitter-ruby  | class, type (module), method (instance + `self.` singleton), function (top-level def) | — | `#` preceding comments | `attr_accessor`, constants, and `include`/`extend` not indexed |
 | Perl       | `.pl`, `.pm`, `.t` | tree-sitter-perl  | function, class (package), constant          | —             | Preceding `#` comments and POD blocks | `use constant` extracted as constants; no return type inference |
+
+\* `.h` uses C++ parsing first, then falls back to C when no C++ symbols are extracted.
 
 ---
 
