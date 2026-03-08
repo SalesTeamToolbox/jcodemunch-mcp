@@ -350,70 +350,99 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 )
             )
         elif name == "list_repos":
-            result = list_repos(storage_path=storage_path)
+            result = await asyncio.to_thread(
+                functools.partial(list_repos, storage_path=storage_path)
+            )
         elif name == "get_file_tree":
-            result = get_file_tree(
-                repo=arguments["repo"],
-                path_prefix=arguments.get("path_prefix", ""),
-                include_summaries=arguments.get("include_summaries", False),
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    get_file_tree,
+                    repo=arguments["repo"],
+                    path_prefix=arguments.get("path_prefix", ""),
+                    include_summaries=arguments.get("include_summaries", False),
+                    storage_path=storage_path,
+                )
             )
         elif name == "get_file_outline":
-            result = get_file_outline(
-                repo=arguments["repo"],
-                file_path=arguments["file_path"],
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    get_file_outline,
+                    repo=arguments["repo"],
+                    file_path=arguments["file_path"],
+                    storage_path=storage_path,
+                )
             )
         elif name == "get_file_content":
-            result = get_file_content(
-                repo=arguments["repo"],
-                file_path=arguments["file_path"],
-                start_line=arguments.get("start_line"),
-                end_line=arguments.get("end_line"),
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    get_file_content,
+                    repo=arguments["repo"],
+                    file_path=arguments["file_path"],
+                    start_line=arguments.get("start_line"),
+                    end_line=arguments.get("end_line"),
+                    storage_path=storage_path,
+                )
             )
         elif name == "get_symbol":
-            result = get_symbol(
-                repo=arguments["repo"],
-                symbol_id=arguments["symbol_id"],
-                verify=arguments.get("verify", False),
-                context_lines=arguments.get("context_lines", 0),
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    get_symbol,
+                    repo=arguments["repo"],
+                    symbol_id=arguments["symbol_id"],
+                    verify=arguments.get("verify", False),
+                    context_lines=arguments.get("context_lines", 0),
+                    storage_path=storage_path,
+                )
             )
         elif name == "get_symbols":
-            result = get_symbols(
-                repo=arguments["repo"],
-                symbol_ids=arguments["symbol_ids"],
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    get_symbols,
+                    repo=arguments["repo"],
+                    symbol_ids=arguments["symbol_ids"],
+                    storage_path=storage_path,
+                )
             )
         elif name == "search_symbols":
-            result = search_symbols(
-                repo=arguments["repo"],
-                query=arguments["query"],
-                kind=arguments.get("kind"),
-                file_pattern=arguments.get("file_pattern"),
-                language=arguments.get("language"),
-                max_results=arguments.get("max_results", 10),
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    search_symbols,
+                    repo=arguments["repo"],
+                    query=arguments["query"],
+                    kind=arguments.get("kind"),
+                    file_pattern=arguments.get("file_pattern"),
+                    language=arguments.get("language"),
+                    max_results=arguments.get("max_results", 10),
+                    storage_path=storage_path,
+                )
             )
         elif name == "invalidate_cache":
-            result = invalidate_cache(
-                repo=arguments["repo"],
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    invalidate_cache,
+                    repo=arguments["repo"],
+                    storage_path=storage_path,
+                )
             )
         elif name == "search_text":
-            result = search_text(
-                repo=arguments["repo"],
-                query=arguments["query"],
-                file_pattern=arguments.get("file_pattern"),
-                max_results=arguments.get("max_results", 20),
-                context_lines=arguments.get("context_lines", 0),
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    search_text,
+                    repo=arguments["repo"],
+                    query=arguments["query"],
+                    file_pattern=arguments.get("file_pattern"),
+                    max_results=arguments.get("max_results", 20),
+                    context_lines=arguments.get("context_lines", 0),
+                    storage_path=storage_path,
+                )
             )
         elif name == "get_repo_outline":
-            result = get_repo_outline(
-                repo=arguments["repo"],
-                storage_path=storage_path
+            result = await asyncio.to_thread(
+                functools.partial(
+                    get_repo_outline,
+                    repo=arguments["repo"],
+                    storage_path=storage_path,
+                )
             )
         else:
             result = {"error": f"Unknown tool: {name}"}
