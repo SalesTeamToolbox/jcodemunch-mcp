@@ -310,6 +310,15 @@ async def index_repo(
 
         # Incremental path
         existing_index = store.load_index(owner, repo)
+
+        if existing_index is None and store.has_index(owner, repo):
+            warnings.append(
+                "Existing index was created by a newer version of jcodemunch-mcp "
+                "and cannot be read — performing a full re-index. "
+                "If you downgraded the package, delete ~/.code-index/ (or your "
+                "CODE_INDEX_PATH directory) to remove the stale index."
+            )
+
         if incremental and existing_index is not None:
             changed, new, deleted = store.detect_changes(owner, repo, current_files)
 

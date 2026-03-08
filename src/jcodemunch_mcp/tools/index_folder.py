@@ -20,7 +20,7 @@ from ..security import (
     is_binary_file,
     should_exclude_file,
     DEFAULT_MAX_FILE_SIZE,
-    get_max_index_files,
+    get_max_folder_files,
     SKIP_PATTERNS,
 )
 from ..storage import IndexStore
@@ -113,7 +113,7 @@ def discover_local_files(
     Returns:
         Tuple of (list of Path objects for source files, list of warning strings).
     """
-    max_files = get_max_index_files(max_files)
+    max_files = get_max_folder_files(max_files)
     files = []
     warnings = []
     root = folder_path.resolve()
@@ -286,7 +286,7 @@ def index_folder(
         return {"success": False, "error": f"Path is not a directory: {path}"}
 
     warnings = []
-    max_files = get_max_index_files()
+    max_files = get_max_folder_files()
 
     try:
         # Discover source files (with security filtering)
@@ -307,6 +307,14 @@ def index_folder(
         owner = "local"
         store = IndexStore(base_path=storage_path)
         existing_index = store.load_index(owner, repo_name)
+
+        if existing_index is None and store.has_index(owner, repo_name):
+            warnings.append(
+                "Existing index was created by a newer version of jcodemunch-mcp "
+                "and cannot be read — performing a full re-index. "
+                "If you downgraded the package, delete ~/.code-index/ (or your "
+                "CODE_INDEX_PATH directory) to remove the stale index."
+            )
 
         # Read all files to build current_files map
         current_files: dict[str, str] = {}

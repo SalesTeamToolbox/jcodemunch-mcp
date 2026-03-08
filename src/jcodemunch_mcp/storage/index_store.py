@@ -337,6 +337,10 @@ class IndexStore:
 
         return index
 
+    def has_index(self, owner: str, name: str) -> bool:
+        """Return True if an index file exists on disk (regardless of version)."""
+        return self._index_path(owner, name).exists()
+
     def load_index(self, owner: str, name: str) -> Optional[CodeIndex]:
         """Load index from storage. Rejects incompatible versions."""
         index_path = self._index_path(owner, name)
