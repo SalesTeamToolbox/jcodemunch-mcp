@@ -26,6 +26,9 @@ from .tools.search_text import search_text
 from .tools.get_repo_outline import get_repo_outline
 
 
+logger = logging.getLogger(__name__)
+
+
 def _default_use_ai_summaries() -> bool:
     """Return the default for use_ai_summaries, respecting JCODEMUNCH_USE_AI_SUMMARIES env var."""
     val = os.environ.get("JCODEMUNCH_USE_AI_SUMMARIES", "").strip().lower()
@@ -327,7 +330,8 @@ async def list_tools() -> list[Tool]:
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls."""
     storage_path = os.environ.get("CODE_INDEX_PATH")
-    
+    logger.info("tool_call: %s args=%s", name, {k: v for k, v in arguments.items() if k != "content"})
+
     try:
         if name == "index_repo":
             result = await index_repo(
@@ -462,6 +466,12 @@ async def run_server():
     import sys
     from mcp.server.stdio import stdio_server
     print(f"jcodemunch-mcp {__version__} by jgravelle · https://github.com/jgravelle/jcodemunch-mcp", file=sys.stderr)
+    logger.info(
+        "startup version=%s storage=%s ai_summaries=%s",
+        __version__,
+        os.environ.get("CODE_INDEX_PATH", "~/.code-index/"),
+        _default_use_ai_summaries(),
+    )
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(

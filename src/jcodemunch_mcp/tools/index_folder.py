@@ -350,6 +350,10 @@ def index_folder(
         existing_index = store.load_index(owner, repo_name)
 
         if existing_index is None and store.has_index(owner, repo_name):
+            logger.warning(
+                "index_folder version_mismatch — %s/%s: on-disk index is a newer version; full re-index required",
+                owner, repo_name,
+            )
             warnings.append(
                 "Existing index was created by a newer version of jcodemunch-mcp "
                 "and cannot be read — performing a full re-index. "
